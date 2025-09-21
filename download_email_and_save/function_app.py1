@@ -1,0 +1,58 @@
+import logging
+import azure.functions as func
+import os
+from azure.data.tables import TableServiceClient
+
+# Create a Function App instance (new v2 model)
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
+# Ensure the table exists (since v2 model does not auto-create)
+def ensure_table_exists(table_name: str):
+    conn_str = os.environ["AzureWebJobsStorage"]
+    service = TableServiceClient.from_connection_string(conn_str)
+    try:
+        service.create_table_if_not_exists(table_name=table_name)
+        logging.info(f"Table '{table_name}' ensured.")
+    except Exception as e:
+        logging.error(f"Error ensuring table exists: {e}")
+
+
+@app.route(route="addUser", methods=["POST", "GET"])
+def add_user(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info("Processing request to insert entity into Table Storage.")
+
+    ensure_table_exists("MyTable")
+
+    try:
+        body = req.get_json()
+        name = body.get("name")
+        age = body.get("age")
+
+        if not name or not age:
+            return func.HttpResponse(
+                "Missing 'name' or 'age' in request body.",
+                status_code=400
+            )
+
+        # Use azure-data-tables SDK to insert (since bindings are not used in v2)
+        conn_str = os.environ["AzureWebJobsStorage"]
+        service = TableServiceClient.from_connection_string(conn_str)
+        table_client = service.get_table_client("MyTable")
+
+        entity = {
+            "PartitionKey": "Users",
+            "RowKey": name.lower(),
+            "Name": name,
+            "Age": str(age)
+        }
+
+        table_client.upsert_entity(entity)  # insert or replace
+
+        return func.HttpResponse(
+            f"Inserted entity for {name}, age {age}.",
+            status_code=200
+        )
+
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        return func.HttpResponse("Error processing request.", status_code=500)
