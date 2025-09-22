@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Optional, Dict, Any
+import json
 
 @dataclass
 class EmailAddress:
@@ -189,3 +190,13 @@ class MessageResponse:
             "value": [m.to_dict() for m in self.value]
         }
 
+
+@dataclass
+class FileAttachment:
+    odata_type: str           # corresponds to "@odata.type"
+    id: str
+    name: str
+    size: int
+    media_content_type: str   # corresponds to "@odata.mediaContentType"
+    media_read_link: str      # corresponds to "@odata.mediaReadLink"
+    content_bytes: Optional[str] = None  # Base64 encoded content, may not be present in metadata response
