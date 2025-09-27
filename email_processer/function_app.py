@@ -13,6 +13,7 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 @app.route(route="email_processer")
 def email_processer(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
+    #GraphAPIUtil.upload_attachment_to_one_drive(file_path="TEST.TXT", folder_path="Attachments")
 
     try:
         email: Message = Message.from_dict(req.get_json())
@@ -44,8 +45,12 @@ def process_email(email: Message):
             continue
     # 2. Download attachment
         destination_path: str =  GraphAPIUtil.download_attachment(attachment=attachment)
+        logging.info(f"Attachment {attachment.name} downloaded to {destination_path}")
+        
     # 3. Save attachment to SharePoint
         #GraphAPIUtil.upload_attachment_to_sharepoint(site_name=os.getenv("SHAREPOINT_SITE_NAME"), file_path=destination_path, folder_path="Shared Documents/General")
+        GraphAPIUtil.upload_attachment_to_one_drive(file_path=destination_path, folder_path="Attachments")
+        logging.info(f"Attachment {attachment.name} uploaded to OneDrive in Attachments folder.")
     # 4. Log metadata to Azure Table Storage
         entity = EmailAttachmentEntity(
             PartitionKey=email.id,
@@ -62,7 +67,7 @@ def process_email(email: Message):
             siteName=os.getenv("SHAREPOINT_SITE_NAME"),
             #driveId=GraphAPIUtil.get_sharepoint_drive_id(GraphAPIUtil.get_sharepoint_site_id(os.getenv("SHAREPOINT_SITE_NAME"))),
             driveId="test",
-            filepath=f"Shared Documents/General/{attachment.name}",
+            filepath=f"/Attachments/{attachment.name}",
             isReported=False,
             reportDateTime=None
         ).__dict__

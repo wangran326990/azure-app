@@ -214,6 +214,18 @@ class GraphAPIUtil:
         return destination_path  
 
     
-
-    
-
+    @staticmethod
+    def upload_attachment_to_one_drive(file_path: str, folder_path: str) -> None:
+        token = GraphAPIUtil.get_access_token()
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        file_name = os.path.basename(file_path)
+        url = f"{GraphAPIUtil.get_graph_api_url()}/me/drive/root:/{folder_path}/{file_name}:/content"
+        with open(file_path, 'rb') as file_data:   
+            response = requests.put(url, headers=headers, data=file_data)
+            if response.status_code in (200, 201):
+                logging.info(f"File {file_name} uploaded to OneDrive folder {folder_path}.")
+            else:
+                raise Exception(f"Error uploading file to OneDrive: {response.status_code} {response.text}")
