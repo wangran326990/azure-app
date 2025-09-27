@@ -1,6 +1,6 @@
-# 7®5„1‚5 Automated Report Triage (Azure Function App)
+# â™»ï¸ Automated Report Triage (Azure Function App)
 
-## ”9ß0 Overview
+## â€9ÃŸ0 Overview
 
 **Automated Report Triage** is an Azure-based automation solution designed to eliminate the daily manual reconciliation process of vendor reports.  
 Our team previously spent **up to one hour per day** downloading and organizing reconciliation reports sent via email.  
@@ -8,7 +8,7 @@ This automation frees up **250+ hours per year**, reduces manual errors, and ens
 
 ---
 
-## •0‹4 Problem Statement
+## â€¢0â€¹4 Problem Statement
 
 ### The Problem: Manual Reconciliation Workflow
 Currently, team members must:
@@ -23,11 +23,11 @@ This **manual process**:
 
 ---
 
-## ”9Ù5 Our Solution: Automated Report Triage
+## â€9Ã™5 Our Solution: Automated Report Triage
 
 The proposed **Azure Function App** automates the initial, repetitive tasks of the reconciliation workflow.
 
-### ”9ã4 How It Works
+### â€9Ã£4 How It Works
 
 1. **Email Ingestion**  
    - The azure function is granted access to a designated **Microsoft 365 mailbox**.  
@@ -45,7 +45,7 @@ The proposed **Azure Function App** automates the initial, repetitive tasks of t
 
 ---
 
-### ”9Ù5 Our Solution: Automated Report Triage
+### â€9Ã™5 Our Solution: Automated Report Triage
 
 | Component               | Description                                                        |
 | ----------------------- | ------------------------------------------------------------------ |
@@ -54,19 +54,19 @@ The proposed **Azure Function App** automates the initial, repetitive tasks of t
 | **OneDrive Online**     | Stores vendor-specific reconciliation reports.                     |
 | **Timer Trigger**       | Sends summary report every day at 4 p.m.                           |
 
-### 75 Back-of-the-Envelope Calculations
+### Â7Â5 Back-of-the-Envelope Calculations
 
 | Item                          | Value                               | Explanation                                            |
 | ----------------------------- | ----------------------------------- | ------------------------------------------------------ |
 | **Time spent daily (manual)** | 60 minutes                          | Team manually downloads and organizes reports each day |
 | **Working days/year**         | 250 days                            | Approximate number of workdays in a year               |
-| **Total annual time**         | 60 min ¡Á 250 = **15,000 minutes**   | = **250 hours/year** saved                             |
+| **Total annual time**         | 60 min Â¡Ã 250 = **15,000 minutes**   | = **250 hours/year** saved                             |
 | **Hourly cost estimate**      | $40/hour                            | Approximate fully loaded team cost                     |
-| **Annual labor savings**      | 250 hrs ¡Á $40/hr = **$10,000/year** | Direct labor cost reduction                            |
+| **Annual labor savings**      | 250 hrs Â¡Ã $40/hr = **$10,000/year** | Direct labor cost reduction                            |
 | **Automation runtime**        | <5 min/day                          | Negligible Azure consumption cost                      |
 
 
-## 7±5„1‚5 Architecture
+## Â7Â±5â€ž1â€š5 Architecture
 
 ```mermaid
 flowchart TD
