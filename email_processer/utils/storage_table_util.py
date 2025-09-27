@@ -39,7 +39,7 @@ class StorageTableUtil:
         try:
             table_client.create_entity(entity=entity)
         except Exception as e:
-            raise Exception(f"Error inserting entity into table {table_name}: {str(e)}")
+            logging.error(f"Error inserting entity into table {table_name}: {str(e)}")
         
     @classmethod
     def get_all_attachments_processed_in_24hrs(cls, table_name: str):
@@ -81,6 +81,3 @@ class StorageTableUtil:
         except Exception as e:
             logging.error(f"Error retrieving entity from table {table_name}: {str(e)}")
             return None
-
-    
-    

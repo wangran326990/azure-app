@@ -30,9 +30,9 @@ def generate_report() -> str:
         logging.info("No attachments processed in the last 24 hours.")
         return "No attachments processed in the last 24 hours."
     # Convert to Excel
-    excel_file = convert_to_excel(attachments)
+    excel_file_path = convert_to_excel(attachments)
     # send email with excel attachment
-    send_gmail_with_attachment(excel_file)
+    send_gmail_with_attachment(excel_file_path)
     
     # Mark all as reported
     mark_attachments_as_reported(attachments, table_name)
@@ -48,9 +48,14 @@ def convert_to_excel(attachments: List[EmailAttachmentEntity]) -> str:
     # Create a DataFrame
     df = pd.DataFrame(data_dicts)
     excel_file_name = os.getenv("EXCEL_FILE_NAME", "daily_report.xlsx")
+    temp_dir = "/tmp"
+    os.makedirs(temp_dir, exist_ok=True)
+
+    # Build full destination path
+    destination_path = os.path.join(temp_dir, excel_file_name)
     # Save to Excel
-    df.to_excel(excel_file_name, index=False)
-    return excel_file_name
+    df.to_excel(destination_path, index=False)
+    return destination_path
 
 def send_gmail_with_attachment(excel_file: str):
     SMTP_SERVER = "smtp.gmail.com"       # e.g., Gmail SMTP

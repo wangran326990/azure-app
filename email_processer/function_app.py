@@ -2,8 +2,6 @@ from ast import List
 import azure.functions as func
 import logging
 import os
-from azure.identity import DefaultAzureCredential
-from azure.keyvault.secrets import SecretClient
 from utils.email_dtos import FileAttachment, Message
 from utils.graph_api_util import GraphAPIUtil
 from utils.storage_table_util import StorageTableUtil
@@ -11,24 +9,26 @@ from datetime import datetime
 from utils.storage_table_entities import EmailAttachmentEntity
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
-@app.route(route="email_getter",methods=["POST"])
-def email_getter(req: func.HttpRequest) -> func.HttpResponse:
 
-        try:
-            email: Message = Message.from_dict(req.get_json())
-            process_email(email)
-        except ValueError:
-            return func.HttpResponse(
-             "Invalid JSON in request body.",
-             status_code=500
-            )
-        logging.info(f"Python HTTP trigger function processed a request. Email: {email.subject}, From: {email.from_.emailAddress}")
+@app.route(route="email_processer")
+def email_processer(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
 
-        #TODO: PROCESS EMAIL FUNCTION HERE 
+    try:
+        email: Message = Message.from_dict(req.get_json())
+        process_email(email)
+    except ValueError:
         return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-             status_code=200
+            "Invalid JSON in request body.",
+            status_code=500
         )
+    logging.info(f"Python HTTP trigger function processed a request. Email: {email.subject}, From: {email.from_.emailAddress}")
+
+    #TODO: PROCESS EMAIL FUNCTION HERE 
+    return func.HttpResponse(
+            "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
+            status_code=200
+    )
 
 def process_email(email: Message):
     # Example function to demonstrate processing the email
@@ -68,8 +68,10 @@ def process_email(email: Message):
         ).__dict__
         StorageTableUtil.insert_entity(table_name=os.getenv("STORAGE_TABLE_NAME"), entity=entity)
 
-    
+
 
 def check_attachment_processed(email_id: str, attachment_id: str) -> bool:
+
     entity = StorageTableUtil.get_entity(table_name=os.getenv("STORAGE_TABLE_NAME"), partition_key=email_id, row_key=attachment_id)
+   
     return entity is not None

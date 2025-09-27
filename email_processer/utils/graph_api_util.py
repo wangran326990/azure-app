@@ -182,14 +182,17 @@ class GraphAPIUtil:
 
     @staticmethod
     def download_attachment(attachment: FileAttachment) -> str:
+        temp_dir = "/tmp"
+        os.makedirs(temp_dir, exist_ok=True)
+        destination_path = os.path.join(temp_dir, attachment.name)
         if not attachment.media_read_link:
             if attachment.content_bytes:
             # Decode base64 content
                 file_content = base64.b64decode(attachment.content_bytes)
                 # Write to file
-                with open(attachment.name, "wb") as f:
+                with open(destination_path, "wb") as f:
                     f.write(file_content)
-                    logging.info(f"Attachment saved as {attachment.name}")
+                    logging.info(f"Attachment saved as {destination_path}")
             else:
                 raise Exception("No content available for attachment.")
         else:
@@ -199,15 +202,16 @@ class GraphAPIUtil:
             }
             download_url = attachment.media_read_link
             response = requests.get(download_url, stream=True, headers=headers)
+        
             if response.status_code == 200:
-                with open(attachment.name, 'wb') as file:
+                with open(destination_path, 'wb') as file:
                     for chunk in response.iter_content(chunk_size=8192):
                         file.write(chunk)
-                logging.info(f"Attachment {attachment.name} downloaded to {attachment.name}.")
+                logging.info(f"Attachment {attachment.name} downloaded to {destination_path}.")
             else:
                 raise Exception(f"Error downloading attachment: {response.status_code} {response.text}")
 
-        return attachment.name   
+        return destination_path  
 
     
 
