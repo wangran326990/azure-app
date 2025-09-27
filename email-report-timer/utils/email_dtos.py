@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import List, Optional, Dict, Any
 import json
 
-
 @dataclass
 class EmailAddress:
     name: str
@@ -15,6 +14,12 @@ class EmailAddress:
             address=obj.get("address", "")
         )
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "address": self.address
+        }
+
 
 @dataclass
 class Recipient:
@@ -25,6 +30,11 @@ class Recipient:
         return Recipient(
             emailAddress=EmailAddress.from_dict(obj.get("emailAddress", {}))
         )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "emailAddress": self.emailAddress.to_dict()
+        }
 
 
 @dataclass
@@ -39,6 +49,12 @@ class Body:
             content=obj.get("content", "")
         )
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "contentType": self.contentType,
+            "content": self.content
+        }
+
 
 @dataclass
 class Flag:
@@ -49,6 +65,11 @@ class Flag:
         return Flag(
             flagStatus=obj.get("flagStatus", "")
         )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "flagStatus": self.flagStatus
+        }
 
 
 @dataclass
@@ -76,7 +97,7 @@ class Message:
     inferenceClassification: str
     body: Body
     sender: Recipient
-    from_: Recipient  # "from" is reserved, so renamed
+    from_: Recipient  # "from" is reserved
     toRecipients: List[Recipient]
     ccRecipients: List[Recipient]
     bccRecipients: List[Recipient]
@@ -117,6 +138,39 @@ class Message:
             flag=Flag.from_dict(obj.get("flag", {}))
         )
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "createdDateTime": self.createdDateTime,
+            "lastModifiedDateTime": self.lastModifiedDateTime,
+            "changeKey": self.changeKey,
+            "categories": self.categories,
+            "receivedDateTime": self.receivedDateTime,
+            "sentDateTime": self.sentDateTime,
+            "hasAttachments": self.hasAttachments,
+            "internetMessageId": self.internetMessageId,
+            "subject": self.subject,
+            "bodyPreview": self.bodyPreview,
+            "importance": self.importance,
+            "parentFolderId": self.parentFolderId,
+            "conversationId": self.conversationId,
+            "conversationIndex": self.conversationIndex,
+            "isDeliveryReceiptRequested": self.isDeliveryReceiptRequested,
+            "isReadReceiptRequested": self.isReadReceiptRequested,
+            "isRead": self.isRead,
+            "isDraft": self.isDraft,
+            "webLink": self.webLink,
+            "inferenceClassification": self.inferenceClassification,
+            "body": self.body.to_dict(),
+            "sender": self.sender.to_dict(),
+            "from": self.from_.to_dict(),
+            "toRecipients": [r.to_dict() for r in self.toRecipients],
+            "ccRecipients": [r.to_dict() for r in self.ccRecipients],
+            "bccRecipients": [r.to_dict() for r in self.bccRecipients],
+            "replyTo": [r.to_dict() for r in self.replyTo],
+            "flag": self.flag.to_dict()
+        }
+
 
 @dataclass
 class MessageResponse:
@@ -133,5 +187,16 @@ class MessageResponse:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "@odata.context": self.odata_context,
-            "value": [m.__dict__ for m in self.value]
+            "value": [m.to_dict() for m in self.value]
         }
+
+
+@dataclass
+class FileAttachment:
+    odata_type: str           # corresponds to "@odata.type"
+    id: str
+    name: str
+    size: int
+    media_content_type: str   # corresponds to "@odata.mediaContentType"
+    media_read_link: str      # corresponds to "@odata.mediaReadLink"
+    content_bytes: Optional[str] = None  # Base64 encoded content, may not be present in metadata response

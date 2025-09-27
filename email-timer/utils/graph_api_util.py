@@ -83,6 +83,24 @@ class GraphAPIUtil:
         else:
             raise Exception(f"Error marking message as read: {response.status_code} {response.text}")
         
+    
+    @staticmethod
+    def mark_message_as_unread(message_id: str) -> None:
+        token = GraphAPIUtil.get_access_token()
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        url = f"{GraphAPIUtil.get_graph_api_messages_url()}/{message_id}"
+        body = {    
+            "isRead": False
+        }
+        response = requests.patch(url, headers=headers, json=body)
+        if response.status_code == 200:
+            logging.info(f"Message {message_id} marked as unread.")
+        else:
+            raise Exception(f"Error marking message as unread: {response.status_code} {response.text}")
+        
 
     
 
